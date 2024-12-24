@@ -5,6 +5,9 @@ package com.muzik.search.Controller;
 import com.muzik.search.DTO.StoreDTO;
 import com.muzik.search.Service.StoreService;
 import com.muzik.search.Util.PageNationUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
@@ -12,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,7 +25,8 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
-@Log
+@Log    // 확인이 필요한
+@Tag(name = "StoreController", description = "컨트롤러")
 public class StoreController {
 
     private final StoreService storeService;
@@ -36,10 +41,14 @@ public class StoreController {
 
               다른 맵핑으로 값과 함께 이동할 때는 RedirectAttributes를 사용
     -------------------------------------------------------------------------------------- */
+    @Operation(summary = "삭제", description = "해당 일련번호로 데이터를 삭제 후, 메세지를 가지고 list 페이지로 이동")
     @GetMapping("/storeDelet")
     public String storeDeleteProc(Integer idx, RedirectAttributes redirectAttributes) {
 
+        log.info(idx + "로 요청");
         Boolean result = storeService.storeDelete(idx);
+
+        log.info("삭제처리 후 검증");
         // 결과 처리
         if (result) {               // 삭제하였습니다.
             redirectAttributes.addFlashAttribute("message", "삭제하였습니다.");
@@ -47,6 +56,7 @@ public class StoreController {
             redirectAttributes.addFlashAttribute("message", "삭제를 실패하였습니다.");
         }
 
+        log.info("목록맵핑으로 요청");
         return "redirect:/storeList";
 
     }
@@ -59,12 +69,19 @@ public class StoreController {
         출력 : 삽입폼으로 이동
         설명 : 해당 맵핑의 요청이 있으면 해당 HTML로 이동
     -------------------------------------------------------------------------------------- */
+    @Operation(summary = "등록페이지", description = "등록페이지 접근 (insert.html)")
     @GetMapping("/storeInsert")
     public String storeInsertForm(Model model) {
         // 검증 라이브러리를 추가하면
         // 입력폼에서 object field를 이용해서 검증처리
-        model.addAttribute("data", new StoreDTO());
+        log.info("빈 DTO를 생성 후 저장");
 
+        // 입력: 검증 시,
+        model.addAttribute("storeDTO", new StoreDTO());
+        // GetMapping model.addAttribute("storeDTO")이거말고 이름 다른거로 설정하면 오류나서 검증작동 안함
+        //
+
+        log.info("입력폼으로 이동");
         return "insert";
     }
 
@@ -76,16 +93,30 @@ public class StoreController {
         출력 : 저장 결과 메세지를 가지고 List로 이동
         설명 : 입력받은 데이터를 데이터베이스에 저장하고, 결과를 가지고 List맵핑으로 이동
     -------------------------------------------------------------------------------------- */
+    @Operation(summary = "등록", description = "입력받은 데이터를 데이터베이스에 저장하고, 결과를 가지고 List맵핑으로 이동 (insert.html)")
     @PostMapping("/storeInsert")
-    public String storeInsertProc(StoreDTO storeDTO, RedirectAttributes redirectAttributes) {
+    // 검증이 필요한 DTO에 @Valid 선언과 함께 BindingResult를 선언
+    public String storeInsertProc(@Valid StoreDTO storeDTO,BindingResult bindingResult ,
+                                  RedirectAttributes redirectAttributes) {
 
+        // HTML -> DTO 검증 -> Service에서 데이터베이스 처리 -> 결과 -> 페이지 이동
+        // 검증의 유효성 판단은 Service전에 작업을 한다.
+        if (bindingResult.hasErrors()) {    // 검증처리 시, 오류가 발생하였다면
+            // 요청을 시도한 HTML으로 되돌아 간다. (GetMapping에 HTML파일로)
+            return "insert";
+        }
+
+        log.info("컨트롤러로 들어온 DTO : " + storeDTO);
         StoreDTO result = storeService.StoreInsert(storeDTO);
+
+        log.info("등록 후 검증");
         if (result != null) {           // 값이 있으면, 저장에 성공했으면
             redirectAttributes.addFlashAttribute("message", "저장을 성공하였습니다.");
         } else {                        // 저장을 실패했으면
             redirectAttributes.addFlashAttribute("message", "저장을 실패하였습니다.");
         }
 
+        log.info("storeList로 맵핑 요청");
         return "redirect:/storeList";
     }
 
@@ -97,6 +128,7 @@ public class StoreController {
         출력 : 수정할 DTO를 전달
         설명 : 일련번호로 해당 데이터를 조회해서 결과값을 HTML에 전달
     -------------------------------------------------------------------------------------- */
+    @Operation(summary = "수정페이지", description = "일련번호로 해당 데이터를 조회해서 결과값을 HTML에 전달 (update.html)")
     @GetMapping("/storeUpdate")
     public String storeUpdateForm(Integer idx, Model model, RedirectAttributes redirectAttributes) {
 
@@ -111,6 +143,7 @@ public class StoreController {
         // 수정할 데이터가 존재하지 않으면
         redirectAttributes.addFlashAttribute("message", "해당 데이터가 존재하지 않습니다.");
 
+        log.warning("비정상적 처리시 storeList맴핑으로 요청");
         return "redirect:/storeList";   // 수정할 데이터가 없으면 목록페이지로 이동
 
     }
@@ -123,6 +156,7 @@ public class StoreController {
         출력 : 수정처리 후 결과 메세지
         설명 : 수정할 데이터를 저장해서 결과 메세지를 가지고 List맵핑으로 이동
     -------------------------------------------------------------------------------------- */
+    @Operation(summary = "수정", description = "수정할 데이터를 저장해서 결과 메세지를 가지고 List맵핑으로 이동 (update.html)")
     @PostMapping("/storeUpdate")
     public String storeUpdateProc(StoreDTO storeDTO, RedirectAttributes redirectAttributes) {
 
@@ -145,6 +179,7 @@ public class StoreController {
         출력 : 조회된 DTO
         설명 : 해당 일련번호로 데이터베이스에서 조회하여 결과를 전달 (HTML 상세페이지)
     -------------------------------------------------------------------------------------- */
+    @Operation(summary = "조회", description = "해당 일련번호로 데이터베이스에서 조회하여 결과를 전달 (read.html)")
     @GetMapping("/storeRead")
     public String storeReadProc(Integer idx, RedirectAttributes redirectAttributes, Model model) {
 
@@ -171,6 +206,7 @@ public class StoreController {
         출력 : Page<StoreDTO>
         설명 : 분류대상에 키워드로 조회한 해당 페이지 데이터를 전달
     -------------------------------------------------------------------------------------- */
+    @Operation(summary = "목록", description = "분류대상에 키워드로 조회한 해당 페이지 데이터를 전달 (list.html)")
     @GetMapping("/storeList")
     public String storeListForm(
             @PageableDefault(page = 1) Pageable pagealbe,                           // 페이지정보, 페이지정보가 없으면 기본값으로 1페이지로 설정
@@ -183,7 +219,7 @@ public class StoreController {
 
         model.addAttribute("list", result);         // 데이터 전달
         model.addAllAttributes(pageInfo);                       // 페이지 정보
-        model.addAttribute("type", type);           // 감색 분류
+        model.addAttribute("type", type);           // 검색 분류
         model.addAttribute("keyword", keyword);     // 키워드
         return "list";
 

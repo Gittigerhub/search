@@ -36,7 +36,10 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     // modelmapper
     implementation 'org.modelmapper:modelmapper:3.1.1'
-    // 검증
+    // swagger를 이용한 API 문서화
+    // Controller에 맵핑을 문서화(DTO의 변수도 문서화)
+    // localhost:8080/swagger-ui/index.html
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
     // 보안
     // 레이아웃
     // AWS

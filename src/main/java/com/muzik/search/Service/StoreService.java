@@ -138,27 +138,27 @@ public class StoreService {
             // 조회
             if (type.equals("1")) {               // type 분류 / 분류가 1이면
                 // 만들어둔 둘중 하나 사용
-                storeEntities = storeRepository.findByStoreNameContaining(keyword, pageable);
+                storeEntities = storeRepository.findByStoreNameContaining(keyword, storePage);
                 // storeEntities = storeRepository.searchStoreName(keyword, pageable);
 
             } else if (type.equals("2")) {        // 총판ID로 검색할 때
-                storeEntities = storeRepository.findByStoreidContaining(keyword, pageable);
+                storeEntities = storeRepository.findByStoreidContaining(keyword, storePage);
                 // storeEntities = searchStoreid.searchStoreName(keyword, pageable);
 
             } else if (type.equals("3")) {        // 총판장ID로 검색할 때
-                storeEntities = storeRepository.findByStorechiefidContaining(keyword, pageable);
+                storeEntities = storeRepository.findByStorechiefidContaining(keyword, storePage);
 
             } else if (type.equals("4")) {        // 총판장으로 검색할 때
-                storeEntities = storeRepository.findByStorechiefContaining(keyword, pageable);
+                storeEntities = storeRepository.findByStorechiefContaining(keyword, storePage);
 
             } else if (type.equals("5")) {        // 총판명 + 총판ID로 검색할 때
-                storeEntities = storeRepository.findByStoreNameOrStoreidContaining(keyword, keyword, pageable);
+                storeEntities = storeRepository.findByStoreNameOrStoreidContaining(keyword, keyword, storePage);
 
             } else if (type.equals("6")) {        // 총판장ID + 총판장으로 검색할 때
-                storeEntities = storeRepository.searchStorechiefidOrStorechief(keyword, pageable);
+                storeEntities = storeRepository.searchStorechiefidOrStorechief(keyword, storePage);
 
             } else {                            // 모든 대상으로 검색할 때
-                storeEntities = storeRepository.searchAll(keyword, pageable);
+                storeEntities = storeRepository.searchAll(keyword, storePage);
 
             }
 

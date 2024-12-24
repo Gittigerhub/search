@@ -11,7 +11,78 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
-<body>
+<body style="background: #d9e0e8">
+    <div class="container">
+        <div class="row">
+            <div class="col-1"></div> <!-- 여백 -->
+            <div class="col-10"> <!-- 입력폼 시작 -->
+                <!-- Controller에서 전달한 model.addAttribute를 object로 선언 -->
+                <form action="#" method="post" th:object="${storeDTO}">
+                    <div class="mt-3 mb-3">
+                        <h2>총판조직 관리</h2>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5>총판조직 등록</h5>
+                            <!--
+                            모든 값은 value가 아닌 field로 선언해서 값을 적용
+                            th:if="${#field.hasError()}"로 오류를 확인하고, errors="*{필드명}"으로 오류출혁
+                            오류메세지는 form내에 아무곳에 지정가능
+                            -->
+                            <table class="table table-bordered">
+                                <tr>
+                                    <td style="width: 13%; text-align: center">매장총판명</td>
+                                    <td style="width: 37%">
+                                        <input type="text" class="form-control" style="width: 70%" placeholder="매장총판명" name="storeName" th:field="*{storeName}">
+                                    </td>
+                                    <td style="width: 13%; text-align: center">총판ID</td>
+                                    <td style="width: 37%">
+                                        <input type="text" class="form-control" style="width: 70%" placeholder="총판ID" name="storeid" th:field="*{storeid}">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 13%; text-align: center">총판장</td>
+                                    <td style="width: 37%" class="">
+                                        <input type="text" class="form-control" style="width: 70%" placeholder="총판장" name="storechief" th:field="*{storechief}">
+                                        <button type="submit" class="btn btn-success">검색</button>
+                                    </td>
+                                    <td style="width: 13%; text-align: center">총판연락처</td>
+                                    <td style="width: 37%">
+                                        <input type="text" class="form-control" style="width: 70%" placeholder="총판연락처" name="storetel">
+                                    </td>
+                                </tr>
+                            </table>
 
+                            <!-- storeName필드에 오류가 발생했으면 p태그를 표시한다.
+                                             storeName에 해당하는 오류메세지를 p태그의 값으로 출력한다. -->
+                            <p th:if="${#fields.hasErrors('storeName')}" style="color: red" th:errors="*{storeName}"></p>
+                            <p th:if="${#fields.hasErrors('storeid')}" style="color: red" th:errors="*{storeid}"></p>
+                            <p th:if="${#fields.hasErrors('storechief')}" style="color: red" th:errors="*{storechief}"></p>
+                            <p th:if="${#fields.hasErrors('storechiefid')}" style="color: red" th:errors="*{storechiefid}"></p>
+
+                            <div class="mb-3 mt-3">
+                                <label for="storechiefid" class="form-label">총판장ID:</label>
+                                <input type="text" class="form-control" id="storechiefid" placeholder="총판장ID" name="storechiefid" th:field="*{storechiefid}">
+                            </div>
+                            <label class="form-label">삭제여부:</label>
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" name="storedel" value="Y" checked>예
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" name="storedel" value="N">아니오
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-success">등록</button>&nbsp;&nbsp;
+                                <button type="button" class="btn btn-secondary">취소</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+            </div> <!-- 입력폼 끝 -->
+            <div class="col-1"></div> <!-- 여백 -->
+        </div>
+    </div>
 </body>
 </html>
