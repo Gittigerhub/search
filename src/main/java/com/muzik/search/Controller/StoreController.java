@@ -76,10 +76,10 @@ public class StoreController {
         // 입력폼에서 object field를 이용해서 검증처리
         log.info("빈 DTO를 생성 후 저장");
 
-        // 입력: 검증 시,
+        // 입력: 검증 시, 입력한 값이나 오류메세지 출력을 위해서 빈 DTO를 폼에 전달
         model.addAttribute("storeDTO", new StoreDTO());
-        // GetMapping model.addAttribute("storeDTO")이거말고 이름 다른거로 설정하면 오류나서 검증작동 안함
-        //
+        // GetMapping model.addAttribute("storeDTO")이름과
+        // PostMapping (StoreDTO storeDTO)이름은 동일하게 지정
 
         log.info("입력폼으로 이동");
         return "insert";
@@ -96,6 +96,7 @@ public class StoreController {
     @Operation(summary = "등록", description = "입력받은 데이터를 데이터베이스에 저장하고, 결과를 가지고 List맵핑으로 이동 (insert.html)")
     @PostMapping("/storeInsert")
     // 검증이 필요한 DTO에 @Valid 선언과 함께 BindingResult를 선언
+    // 적용 순서는 반드시 지켜서 기재
     public String storeInsertProc(@Valid StoreDTO storeDTO,BindingResult bindingResult ,
                                   RedirectAttributes redirectAttributes) {
 
@@ -134,6 +135,7 @@ public class StoreController {
 
         StoreDTO read = storeService.StoreRead(idx);
         if (read != null) {                 // 수정할 데이터가 존재하면
+            //수정시 수정할 DTO를 전달하므로 검증에 필요한 추가 작업없다.
             model.addAttribute("data", read);
 
             return "update";                // 수정할 데이터가 있으면 수정폼으로 이동
